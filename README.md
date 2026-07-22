@@ -101,7 +101,7 @@ cd subtitle-ai-dashboard
 
 ### ขั้นตอนที่ 4: ติดตั้ง (double-click)
 ```
-ดับเบิลคลิก  install.bat
+ดับเบิลคลิก  windows-install.bat
 ```
 โปรแกรมจะติดตั้งให้ทั้งหมดอัตโนมัติ:
 - สร้าง Python virtual environment
@@ -112,9 +112,16 @@ cd subtitle-ai-dashboard
 
 ### ขั้นตอนที่ 5: เริ่มใช้งาน (double-click)
 ```
-ดับเบิลคลิก  start.bat
+ดับเบิลคลิก  windows-start.bat
 ```
 เบราว์เซอร์จะเปิด `http://localhost:3000` อัตโนมัติ 🎉
+
+---
+
+### สำหรับ อัพเดตเท่านั้น (double-click)
+```
+ดับเบิลคลิก  update.bat
+```
 
 ---
 
@@ -165,8 +172,8 @@ subtitle-ai-dashboard/
 │   │   └── lib/            # utils + constants
 │   └── package.json
 ├── docs/screenshots/         # ภาพหน้าจอ (สำหรับ README)
-├── install.bat              # สคริปต์ติดตั้ง (Windows)
-├── start.bat                # เริ่มระบบ (dev mode)
+├── windows-install.bat              # สคริปต์ติดตั้ง (Windows)
+├── windows-start.bat                # เริ่มระบบ (dev mode)
 ├── build.bat                # สร้าง production build
 ├── start-prod.bat           # เริ่มระบบ (production mode)
 ├── README.md
