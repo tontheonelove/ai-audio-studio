@@ -46,9 +46,9 @@
 
 | AI Translator | Text-to-Speech |
 |:---:|:---:|
-| ![Translator](docs/screenshots/translator.png) | ![TTS](docs/screenshots/tts.png) |
+| ![Translator](/docs/screenshorts/a1.png) | ![TTS](/docs/screenshorts/a2.png) |
 | **Speech-to-Text** | **Music Separator** |
-| ![STT](docs/screenshots/stt.png) | ![Separator](docs/screenshots/separator.png) |
+| ![STT](/docs/screenshorts/a4.png) | ![Separator](/docs/screenshorts/a3.png) |
 
 ---
 
