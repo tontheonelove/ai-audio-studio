@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 24 95% 53%;              /* 🟠 ส้ม (orange-500) */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 100% 96%;
+    --secondary-foreground: 24 95% 30%;
+    --muted: 30 30% 95%;
+    --muted-foreground: 24 10% 46%;
+    --accent: 30 100% 94%;
+    --accent-foreground: 24 95% 35%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 30 30% 90%;
+    --input: 30 30% 90%;
+    --ring: 24 95% 53%;                 /* 🟠 focus ring ส้ม */
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 27 96% 61%;              /* 🟠 ส้มสว่างบนพื้นเข้ม */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 27 96% 61%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-prompt;
+  }
+}
+
+/* ===== 🟠 Animated Gradient Background (ขาว/ส้ม + glow 3 จุด = มิติ) ===== */
+.animated-gradient {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(255, 138, 61, 0.22), transparent 42%),
+    radial-gradient(circle at 85% 5%, rgba(255, 90, 30, 0.16), transparent 45%),
+    radial-gradient(circle at 50% 100%, rgba(255, 176, 92, 0.22), transparent 52%),
+    linear-gradient(-45deg, #fff6ee, #ffe7d2, #fff1e3, #ffe1c7);
+  background-size: 180% 180%, 180% 180%, 180% 180%, 400% 400%;
+  animation: gradient-shift 18s ease infinite;
+}
+
+.dark .animated-gradient {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(255, 120, 40, 0.12), transparent 42%),
+    radial-gradient(circle at 85% 100%, rgba(255, 90, 30, 0.09), transparent 45%),
+    linear-gradient(-45deg, #0f172a, #1e293b, #2a1d16, #1e293b);
+  background-size: 180% 180%, 180% 180%, 400% 400%;
+}
+
+/* ===== ✨ Glass morphism แบบ "นูน" (inset highlight + colored shadow) ===== */
+.glass {
+  @apply backdrop-blur-xl border;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.80));
+  border-color: rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.9) inset,           /* ขอบบนสว่าง = นูน */
+    0 -1px 0 0 rgba(234, 88, 12, 0.05) inset,
+    0 12px 34px -12px rgba(234, 88, 12, 0.22),          /* เงาส้มจาง = เรือง */
+    0 4px 14px -6px rgba(0, 0, 0, 0.10);
+}
+
+.dark .glass {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.94), rgba(15, 23, 42, 0.86));
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.07) inset,
+    0 12px 34px -12px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+/* Shimmer effect */
+.shimmer-overlay {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ซ่อน scrollbar แต่ยัง scroll ได้ (mobile nav) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

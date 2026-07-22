@@ -1,0 +1,41 @@
+# ===== Python =====
+backend/venv/
+**/__pycache__/
+*.pyc
+*.pyo
+backend/models/
+*.egg-info/
+
+# ===== Node / Next.js =====
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# ===== FFmpeg binaries (FC ต้องดาวน์โหลดวางเอง — ดู README) =====
+backend/ffmpeg.exe
+backend/ffplay.exe
+backend/ffprobe.exe
+backend/ff*.exe
+
+# ===== Environment (ห้าม commit) =====
+.env
+.env.local
+.env*.local
+
+# ===== AI editor files (ไม่จำเป็นสำหรับ FC) =====
+AGENTS.md
+CLAUDE.md
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp
+
+# ===== Logs =====
+*.log
+npm-debug.log*
