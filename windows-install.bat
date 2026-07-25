@@ -49,28 +49,10 @@ call "%~dp0backend\venv\Scripts\activate.bat"
 if errorlevel 1 goto :error
 python -m pip install --upgrade pip >nul 2>&1
 
-REM ---- [6] ตรวจ GPU แล้วเลือก PyTorch build ที่ถูกต้อง (สำคัญมาก!) ----
+REM ---- [6] ลง PyTorch CUDA 12.6 "ก่อน" (สำคัญมาก - ต้องก่อน requirements) ----
 echo.
-set CC_MAJOR=0
-for /f "tokens=1 delims=." %%c in ('nvidia-smi --query-gpu=compute_cap --format=csv,noheader 2^>nul') do set CC_MAJOR=%%c
-if "!CC_MAJOR!"=="" set CC_MAJOR=0
-
-set TORCH_INDEX=cu126
-set TORCH_SPEC=torch==2.6.0+cu126 torchaudio==2.6.0+cu126 torchvision==0.21.0+cu126
-
-if !CC_MAJOR! GEQ 10 (
-    echo [INFO] ตรวจพบ GPU สถาปัตยกรรมใหม่ ^(compute capability !CC_MAJOR!.x = Blackwell / RTX 50 Series^)
-    echo        -^> ใช้ PyTorch CUDA 12.8 ^(รองรับ sm_120^)
-    set TORCH_INDEX=cu128
-    set TORCH_SPEC=torch torchvision torchaudio
-) else (
-    echo [INFO] GPU compute capability = !CC_MAJOR!.x ^(Pascal/Turing/Ampere/Ada/Hopper^)
-    echo        -^> ใช้ PyTorch CUDA 12.6 ^(รองรับ sm_61 ขึ้นไป^)
-)
-
-echo.
-echo [..] กำลังติดตั้ง PyTorch ^(!TORCH_INDEX!^) ... (ขั้นนี้อาจนาน ดึงไฟล์ ~2.5GB)
-pip install !TORCH_SPEC! --index-url https://download.pytorch.org/whl/!TORCH_INDEX!
+echo [..] กำลังติดตั้ง PyTorch CUDA 12.6 ... (ขั้นนี้อาจนาน ดึงไฟล์ ~2.5GB)
+pip install torch==2.6.0+cu126 torchaudio==2.6.0+cu126 torchvision==0.21.0+cu126 --index-url https://download.pytorch.org/whl/cu126
 if errorlevel 1 goto :error
 echo [OK] ลง PyTorch เสร็จ
 
@@ -98,7 +80,7 @@ cd /d "%~dp0"
 echo.
 echo ============================================================
 echo    ติดตั้งเสร็จสมบูรณ์!
-echo    ขั้นตอนต่อไป: ดับเบิลคลิก  windows-start.bat  เพื่อเริ่มใช้งาน
+echo    ขั้นตอนต่อไป: ดับเบิลคลิก  start.bat  เพื่อเริ่มใช้งาน
 echo ============================================================
 echo.
 pause
