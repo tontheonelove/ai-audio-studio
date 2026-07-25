@@ -8,6 +8,7 @@
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)
 ![GPU](https://img.shields.io/badge/GPU-CUDA%2012.6-76B900)
+![GPU](https://img.shields.io/badge/GPU-CUDA%2012.8-76B900)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
