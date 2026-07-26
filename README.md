@@ -111,9 +111,10 @@ cd subtitle-ai-dashboard
 คัดลอก `ffmpeg.exe` ไปวางในโฟลเดอร์ `backend/`
 > 💡 โปรแกรมจะเพิ่ม FFmpeg เข้า PATH ให้อัตโนมัติ (ไม่งั้นต้อง add PATH เอง)
 
-### ขั้นตอนที่ 4: ติดตั้ง (double-click)
+### ขั้นตอนที่ 4: ติดตั้ง (double-click) เลือกให้ถูกต้อง
 ```
-ดับเบิลคลิก  windows-install.bat
+ดับเบิลคลิก  windows-install.bat (สำหรับ GPU ตั้งแต่ GTX ไปจนถึง RTX 40 Series)
+ดับเบิลคลิก  windows-install-rtx50-only.bat  (สำหรับ GPU RTX 50Series เท่านั้น)
 ```
 โปรแกรมจะติดตั้งให้ทั้งหมดอัตโนมัติ:
 - สร้าง Python virtual environment
