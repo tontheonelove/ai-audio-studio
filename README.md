@@ -118,7 +118,7 @@ cd subtitle-ai-dashboard
 ```
 โปรแกรมจะติดตั้งให้ทั้งหมดอัตโนมัติ:
 - สร้าง Python virtual environment
-- ติดตั้ง PyTorch (CUDA 12.6)
+- ติดตั้ง PyTorch 
 - ติดตั้ง Python packages + Frontend dependencies
 
 > ⏳ ขั้นตอนนี้ใช้เวลาหลายนาที (ดาวน์โหลดไฟล์ ~3-5 GB) กรุณารอจนเสร็จ
