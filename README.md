@@ -169,6 +169,8 @@ chmod +x linux-*.sh
 
 # เริ่มใช้งาน (Ctrl+C เพื่อปิด)
 ./linux-start.sh
+```
+
 
 ---
 
