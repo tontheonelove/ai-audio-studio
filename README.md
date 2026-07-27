@@ -204,33 +204,6 @@ chmod +x linux-*.sh
 
 ---
 
-## 📁 โครงสร้างโปรเจค
-
-```
-subtitle-ai-dashboard/
-├── backend/                  # FastAPI backend (Python)
-│   ├── main.py              # API หลัก (Translator + TTS + STT + Separator)
-│   ├── requirements.txt     # Python dependencies
-│   ├── ffmpeg.exe           # ⚠️ ต้องวางเอง (ไม่รวมใน repo)
-│   └── models/              # โมเดล AI (ดาวน์โหลดอัตโนมัติ, ไม่รวมใน repo)
-├── frontend/                 # Next.js frontend
-│   ├── src/
-│   │   ├── app/            # หน้าเว็บ + API routes
-│   │   ├── components/     # UI components
-│   │   ├── hooks/          # React hooks
-│   │   └── lib/            # utils + constants
-│   └── package.json
-├── docs/screenshots/         # ภาพหน้าจอ (สำหรับ README)
-├── windows-install.bat              # สคริปต์ติดตั้ง (Windows)
-├── windows-start.bat                # เริ่มระบบ (dev mode)
-├── build.bat                # สร้าง production build
-├── start-prod.bat           # เริ่มระบบ (production mode)
-├── README.md
-└── LICENSE
-```
-
----
-
 ## ⚠️ การแก้ปัญหา (Troubleshooting)
 
 ### ❌ `torch` / CUDA ใช้ไม่ได้
