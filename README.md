@@ -1,4 +1,4 @@
-# 🎬 AI Studio
+# 🎬 AI Audio Studio 3.4
 
 > ชุดเครื่องมือ AI สำหรับงานเสียง **ครบ 4 ฟีเจอร์ในเว็บเดียว** — แปลงซับไทย • สร้างเสียงพูด • ถอดข้อความ • แยกเสียงร้อง/ดนตรี
 >
@@ -13,7 +13,7 @@
 
 --- 
 
-### update 27 - 7 - 26 🚀  (RUN  update.bat and start.bat to try new update)
+### Update V3.4  27 - 7 - 26 🚀  (RUN  update.bat )
 - AI TRANSLATOR ADD 13 language.✅
 - ADD CHUNKING FOR OMNIVOICE SUPPORT LONG MSG.✅
 - Fix BUG RTX 50 Series 🪛
