@@ -115,7 +115,7 @@ export function Sidebar() {
               className="bg-orange-50 dark:bg-white/10 border-orange-200 dark:border-white/20 text-orange-700 dark:text-foreground text-xs"
             >
               <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse" />
-              v3.0
+              v3.4
             </Badge>
           </div>
         </div>
