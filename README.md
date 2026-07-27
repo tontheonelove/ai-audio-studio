@@ -11,6 +11,19 @@
 ![GPU](https://img.shields.io/badge/GPU-CUDA%2012.8-76B900)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+--- 
+
+### update 27 - 7 - 26 🚀  (RUN  update.bat and start.bat to try new update)
+- AI TRANSLATOR ADD 13 language.✅
+- ADD CHUNKING FOR OMNIVOICE SUPPORT LONG MSG.✅
+- Fix BUG RTX 50 Series 🪛
+- FIX BUG IMNIVOICE 🪛
+- SUPPORT LINUX 🔥
+
+| AI Translator New | CHUNKING |
+|:---:|:---:|
+| ![Translator](/docs/screenshorts/ai-translator.png) | ![CHUNKING](/docs/screenshorts/chunk.png) 
+
 ---
 
 ## ✨ ฟีเจอร์
@@ -135,6 +148,27 @@ cd subtitle-ai-dashboard
 ```
 ดับเบิลคลิก  update.bat
 ```
+
+---
+
+### 🐧 Linux
+```bash
+# ติดตั้งโปรแกรมพื้นฐาน (Debian/Ubuntu)
+sudo apt install python3 python3-venv python3-pip ffmpeg git
+
+# clone แล้วเข้าโฟลเดอร์
+git clone https://github.com/tontheonelove/ai-audio-studio.git
+cd subtitle-ai-dashboard
+
+# ทำให้ script รันได้
+chmod +x linux-*.sh
+
+# ติดตั้ง (เลือกตาม GPU)
+./linux-install.sh                 # GPU ทั่วไป
+./linux-install-rtx50-only.sh      # RTX 50 Series
+
+# เริ่มใช้งาน (Ctrl+C เพื่อปิด)
+./linux-start.sh
 
 ---
 

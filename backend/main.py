@@ -65,6 +65,7 @@ import shutil
 import zipfile
 import glob
 import soundfile as sf
+import numpy as np
 from urllib.parse import urlparse
 from faster_whisper import WhisperModel
 from deep_translator import GoogleTranslator
@@ -214,6 +215,7 @@ def download_audio_from_url(url: str, output_dir: str) -> str:
 async def transcribe(
     file: UploadFile = File(...),
     source_lang: str = Form("auto"),
+    target_lang: str = Form("th"),     # ✅ ใหม่: ภาษาเป้าหมาย (default ไทย)
     bg: BackgroundTasks = None,
 ):
     try:
@@ -223,21 +225,22 @@ async def transcribe(
         tmp_audio.write(await file.read())
         tmp_audio.close()
         whisper_lang = None if source_lang == "auto" else source_lang
-        print(f"🔍 กำลังถอดความ (โหมด: {source_lang})...")
+        target = target_lang.strip().lower() or "th"                       # ✅ ใหม่
+        print(f"🔍 กำลังถอดความ (source={source_lang} -> target={target})...")
         segments, info = m.transcribe(tmp_audio.name, language=whisper_lang, task="transcribe", beam_size=5, vad_filter=True)
         seg_list = list(segments)
         if not seg_list:
             raise HTTPException(status_code=400, detail="ไม่พบข้อความในไฟล์")
         translate_source = info.language if source_lang == "auto" else source_lang
-        is_thai_source = translate_source == "th"
-        translator = None if is_thai_source else GoogleTranslator(source=translate_source, target='th')
+        skip_translate = (translate_source == target)                      # ✅ ใหม่: ไม่แปลเมื่อ จาก==ไป
+        translator = None if skip_translate else GoogleTranslator(source=translate_source, target=target)  # ✅ target แทน 'th'
         cache = {}
         srt_lines = []
         for i, seg in enumerate(seg_list, 1):
             txt = seg.text.strip()
             if not txt:
                 continue
-            if is_thai_source:
+            if skip_translate:                                             # ✅ ใหม่
                 final_text = txt
             else:
                 if txt in cache:
@@ -250,12 +253,16 @@ async def transcribe(
                     except Exception:
                         final_text = txt
             srt_lines.append(f"{i}\n{format_srt_time(seg.start)} --> {format_srt_time(seg.end)}\n{final_text}\n")
-        tmp_srt = tempfile.NamedTemporaryFile(delete=False, suffix="_TH.srt", mode="w", encoding="utf-8")
+        tmp_srt = tempfile.NamedTemporaryFile(delete=False, suffix=f"_{target.upper()}.srt", mode="w", encoding="utf-8")  # ✅ ใหม่
         tmp_srt.write("\n".join(srt_lines))
         tmp_srt.close()
         bg.add_task(cleanup, [tmp_audio.name, tmp_srt.name])
-        print(f"✅ เสร็จสิ้น! แปลจาก {translate_source.upper()} เป็น TH")
-        out_name = f"{os.path.splitext(file.filename)[0]}.srt"
+        if skip_translate:
+            print(f"✅ เสร็จสิ้น! {translate_source.upper()} (ไม่แปล - source==target)")
+        else:
+            print(f"✅ เสร็จสิ้น! แปลจาก {translate_source.upper()} เป็น {target.upper()}")
+        base = os.path.splitext(file.filename)[0]
+        out_name = f"{base}_{target.upper()}.srt"                          # ✅ ใหม่: ชื่อไฟล์บอกภาษาเป้าหมาย
         return FileResponse(tmp_srt.name, filename=out_name, media_type="application/x-subrip")
     except HTTPException:
         raise
@@ -263,11 +270,11 @@ async def transcribe(
         print(f"❌ Backend Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/transcribe-url")
 async def transcribe_url(
     url: str = Form(...),
     source_lang: str = Form("auto"),
+    target_lang: str = Form("th"),     # ✅ ใหม่
     bg: BackgroundTasks = None,
 ):
     try:
@@ -276,21 +283,22 @@ async def transcribe_url(
         print(f"📥 กำลังดาวน์โหลดจาก: {url}")
         audio_path = download_audio_from_url(url, temp_dir)
         whisper_lang = None if source_lang == "auto" else source_lang
-        print(f"🔍 กำลังถอดความ (โหมด: {source_lang})...")
+        target = target_lang.strip().lower() or "th"                       # ✅ ใหม่
+        print(f"🔍 กำลังถอดความ (source={source_lang} -> target={target})...")
         segments, info = m.transcribe(audio_path, language=whisper_lang, task="transcribe", beam_size=5, vad_filter=True)
         seg_list = list(segments)
         if not seg_list:
             raise HTTPException(status_code=400, detail="ไม่พบข้อความในไฟล์")
         translate_source = info.language if source_lang == "auto" else source_lang
-        is_thai_source = translate_source == "th"
-        translator = None if is_thai_source else GoogleTranslator(source=translate_source, target='th')
+        skip_translate = (translate_source == target)                      # ✅ ใหม่
+        translator = None if skip_translate else GoogleTranslator(source=translate_source, target=target)  # ✅
         cache = {}
         srt_lines = []
         for i, seg in enumerate(seg_list, 1):
             txt = seg.text.strip()
             if not txt:
                 continue
-            if is_thai_source:
+            if skip_translate:                                             # ✅
                 final_text = txt
             else:
                 if txt in cache:
@@ -303,7 +311,7 @@ async def transcribe_url(
                     except Exception:
                         final_text = txt
             srt_lines.append(f"{i}\n{format_srt_time(seg.start)} --> {format_srt_time(seg.end)}\n{final_text}\n")
-        tmp_srt = tempfile.NamedTemporaryFile(delete=False, suffix="_TH.srt", mode="w", encoding="utf-8")
+        tmp_srt = tempfile.NamedTemporaryFile(delete=False, suffix=f"_{target.upper()}.srt", mode="w", encoding="utf-8")  # ✅
         tmp_srt.write("\n".join(srt_lines))
         tmp_srt.close()
         bg.add_task(cleanup, [audio_path, tmp_srt.name])
@@ -311,15 +319,17 @@ async def transcribe_url(
             os.rmdir(temp_dir)
         except Exception:
             pass
-        print(f"✅ เสร็จสิ้น! แปลจาก {translate_source.upper()} เป็น TH")
+        if skip_translate:
+            print(f"✅ เสร็จสิ้น! {translate_source.upper()} (ไม่แปล - source==target)")
+        else:
+            print(f"✅ เสร็จสิ้น! แปลจาก {translate_source.upper()} เป็น {target.upper()}")
         srt_name = extract_name_from_url(url)
-        return FileResponse(tmp_srt.name, filename=f"{srt_name}.srt", media_type="application/x-subrip")
+        return FileResponse(tmp_srt.name, filename=f"{srt_name}_{target.upper()}.srt", media_type="application/x-subrip")  # ✅
     except HTTPException:
         raise
     except Exception as e:
         print(f"❌ Backend Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================
 # [5] OmniVoice TTS Engine
@@ -337,9 +347,69 @@ def load_tts_model():
     print("✅ [TTS] OmniVoice โหลดสำเร็จ! 🎙️")
     return tts_model
 
+# ============================================================
+# [TTS-CHUNK] ค่าจูนการตัดข้อความ (ปรับได้ตามต้องการ)
+# ============================================================
+TTS_CHUNK_MAX = 220      # ตัวอักษรสูงสุดต่อ chunk (เกินนี้จะพยายามตัดที่จุดธรรมชาติ)
+TTS_CHUNK_MIN = 20       # chunk ที่สั้นกว่านี้ จะถูกรวมกับ chunk ข้างเคียง (กันท่อนจิ๋วฟังแปลก)
+TTS_SILENCE_SEC = 0.25   # หยุดหายใจระหว่าง chunk (วินาที) → ฟังเป็นธรรมชาติ
+TTS_SAMPLE_RATE = 24000  # sample rate ของ OmniVoice (ห้ามเปลี่ยน ถ้าโมเดลไม่เปลี่ยน)
+
+# ชุดเครื่องหมาย "จุดตัดธรรมชาติ" (รองรับไทย + อังกฤษ)
+_SENTENCE_END = set('.!?。…ฯ\n')     # จบประโยค → จุดตัดดีที่สุด
+_CLAUSE_BREAK = set(',;:،、 ')        # หยุดระหว่างวลี → จุดตัดรอง
+
+
+def _split_long_segment(seg, max_chars):
+    """ตัด segment เดียวที่ยาวเกิน max_chars ที่จุดธรรมชาติ (fallback ตัดกลางถ้าจำเป็น)"""
+    if len(seg) <= max_chars:
+        return [seg]
+    chunks, buf, last_break = [], "", -1
+    for ch in seg:
+        buf += ch
+        if ch in _SENTENCE_END or ch in _CLAUSE_BREAK:
+            last_break = len(buf)
+        if len(buf) >= max_chars:
+            if last_break > max_chars // 2:           # มีจุดตัดที่พอเหมาะ → ตัดตรงนั้น
+                chunks.append(buf[:last_break].strip())
+                buf = buf[last_break:]
+            else:                                      # ไม่มีจุดตัด → hard cut (ยอมตัดกลาง ดีกว่าเพี้ยนทั้งก้อน)
+                chunks.append(buf.strip())
+                buf = ""
+            last_break = -1
+    if buf.strip():
+        chunks.append(buf.strip())
+    return [c for c in chunks if c]
+
+
+def split_into_chunks(text, max_chars=TTS_CHUNK_MAX, min_chars=TTS_CHUNK_MIN):
+    """
+    ตัดข้อความยาวเป็น chunk สั้นๆ ที่จุดธรรมชาติ (รองรับภาษาไทย)
+    - ตัดหยาบที่ 'ขึ้นบรรทัดใหม่' ก่อน
+    - ตัดย่อยที่เครื่องหมายจบประโยค/หยุดวลี
+    - รวม chunk จิ๋วที่สั้นเกินเข้ากับข้างเคียง
+    """
+    text = text.strip()
+    if not text:
+        return []
+    raw = [p.strip() for p in text.split('\n') if p.strip()]   # 1) ตัดที่ newline
+    chunks = []
+    for p in raw:                                               # 2) ตัดย่อย paragraph ที่ยาว
+        chunks.extend(_split_long_segment(p, max_chars))
+    merged = []                                                 # 3) รวม chunk จิ๋ว
+    for c in chunks:
+        if merged and len(merged[-1]) < min_chars:
+            merged[-1] = (merged[-1] + " " + c).strip()
+        else:
+            merged.append(c)
+    if len(merged) >= 2 and len(merged[-1]) < min_chars:        # chunk สุดท้ายจิ๋ว → รวมย้อน
+        merged[-2] = (merged[-2] + " " + merged[-1]).strip()
+        merged.pop()
+    return [c for c in merged if c]
+
 
 # ============================================================
-# [6] OmniVoice TTS Route
+# [6] OmniVoice TTS Route (รองรับ chunking สำหรับ text ยาว)
 # ============================================================
 @app.post("/tts")
 async def tts(
@@ -357,7 +427,9 @@ async def tts(
         if not clean_text:
             raise HTTPException(status_code=400, detail="ข้อความว่างเปล่า")
         m = load_tts_model()
-        gen_kwargs = {"text": clean_text, "speed": speed, "num_step": num_step}
+
+        # --- เตรียม base_kwargs (ใช้เหมือนกันทุก chunk → เสียงคงที่ตลอด) ---
+        base_kwargs = {"speed": speed, "num_step": num_step}
         ref_tmp_path = None
         if mode == "clone":
             if ref_audio is None or not ref_audio.filename:
@@ -367,25 +439,50 @@ async def tts(
             tmp_ref.write(await ref_audio.read())
             tmp_ref.close()
             ref_tmp_path = tmp_ref.name
-            gen_kwargs["ref_audio"] = ref_tmp_path
+            base_kwargs["ref_audio"] = ref_tmp_path
             if ref_text.strip():
-                gen_kwargs["ref_text"] = ref_text.strip()
+                base_kwargs["ref_text"] = ref_text.strip()
         elif mode == "design":
             if instruct.strip():
-                gen_kwargs["instruct"] = instruct.strip()
-        print(f"🔊 [TTS] generate mode={mode} | text_len={len(clean_text)} | speed={speed} | steps={num_step}")
-        audio_list = m.generate(**gen_kwargs)
+                base_kwargs["instruct"] = instruct.strip()
+
+        # --- ตัด chunk ---
+        chunks = split_into_chunks(clean_text)
+        print(f"🔊 [TTS] mode={mode} | text_len={len(clean_text)} | chunks={len(chunks)} | speed={speed} | steps={num_step}")
+
+        # --- generate (chunk เดียว = เหมือนเดิม / หลาย chunk = ต่อรวม + หยุดหายใจ) ---
+        if len(chunks) <= 1:
+            # text สั้น → ไม่ chunk (รักษาพฤติกรรมเดิม 100%)
+            audio_list = m.generate(text=clean_text, **base_kwargs)
+            if not audio_list:
+                raise HTTPException(status_code=500, detail="สร้างเสียงล้มเหลว")
+            final_audio = np.asarray(audio_list[0])
+        else:
+            # text ยาว → generate ทีละ chunk แล้วต่อ
+            parts = []
+            silence = np.zeros(int(TTS_SAMPLE_RATE * TTS_SILENCE_SEC), dtype=np.float32)
+            for idx, ch in enumerate(chunks):
+                print(f"   ↳ chunk {idx + 1}/{len(chunks)}: {len(ch)} chars")
+                a = m.generate(text=ch, **base_kwargs)
+                if not a:
+                    raise HTTPException(status_code=500, detail=f"สร้างเสียง chunk {idx + 1} ล้มเหลว")
+                parts.append(np.asarray(a[0], dtype=np.float32))
+                if idx < len(chunks) - 1:
+                    parts.append(silence)   # แทรกหยุดหายใจระหว่าง chunk (ไม่ใส่หลัง chunk สุดท้าย)
+            final_audio = np.concatenate(parts)
+
+        # --- cleanup ref ---
         if ref_tmp_path:
             try:
                 os.remove(ref_tmp_path)
             except Exception:
                 pass
-        if not audio_list:
-            raise HTTPException(status_code=500, detail="สร้างเสียงล้มเหลว")
+
+        # --- เขียนไฟล์ ---
         tmp_out = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
         tmp_out.close()
-        sf.write(tmp_out.name, audio_list[0], 24000)
-        print(f"✅ [TTS] เสร็จ! → {tmp_out.name}")
+        sf.write(tmp_out.name, final_audio, TTS_SAMPLE_RATE)
+        print(f"✅ [TTS] เสร็จ! → {tmp_out.name} | chunks={len(chunks)}")
         if bg:
             bg.add_task(cleanup, [tmp_out.name])
         safe = re.sub(r'[^\w\-]', '', clean_text.replace(' ', '_'))[:30] or "tts"
@@ -395,7 +492,6 @@ async def tts(
     except Exception as e:
         print(f"❌ [TTS] Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ============================================================
 # [7] Whisper STT Route (ถอดเสียงอย่างเดียว ไม่แปล + คืน JSON)
